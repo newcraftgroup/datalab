@@ -29,6 +29,14 @@ libraries such as numpy, pandas, scikit-learn and matplotlib, in a ready-to-use 
 You can run the docker container locally or in GCE, as described in the
 [wiki](https://github.com/googledatalab/datalab/wiki/Getting-Started).
 
+In short, the docker image can be built as follows:
+```bash
+$ cd ./containers/datalab
+$ ./build.sh
+```
+
+This builds the `base` container first, which also contains the installation of the R kernel.
+
 ### Contacting Us
 
 For support or help using DataLab, please submit questions tagged with `google-cloud-datalab` on [StackOverflow](https://stackoverflow.com/questions/tagged/google-cloud-datalab).
