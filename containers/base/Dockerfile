@@ -32,6 +32,8 @@ ENV PYTHON_3_ENV py3env
 # Needed to run "source" for switching Conda environments.
 SHELL ["/bin/bash", "-c"]
 
+RUN apt-get update -y && apt-get install -y --no-install-recommends apt-utils
+
 # Setup OS and core packages
 RUN echo "deb-src http://ftp.us.debian.org/debian testing main" >> /etc/apt/sources.list && \
     apt-get update -y && \
@@ -223,7 +225,7 @@ RUN echo "deb-src http://ftp.us.debian.org/debian testing main" >> /etc/apt/sour
 # Install Python3 packages that aren't available or up-to-date in Conda.
 # For some reasons, merging it with the commands above does not work so creating a separate one.
 RUN source activate $PYTHON_3_ENV && \
-    pip install --quiet -U --upgrade-strategy only-if-needed --no-cache-dir \
+    pip install -U --upgrade-strategy only-if-needed --no-cache-dir \
         apache-airflow==1.9.0 \
         bs4==0.0.1 \
         ggplot==0.6.8 \
@@ -285,6 +287,51 @@ COPY license.sh /tools/license
 COPY third_party_licenses.csv /tools/license
 RUN mkdir /usr/licenses && \
     /tools/license/license.sh /tools/license/third_party_licenses.csv /usr/licenses
+
+
+
+RUN echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list.d/debian-unstable.list \
+    && echo 'APT::Default-Release "testing";' > /etc/apt/apt.conf.d/default
+
+ENV R_BASE_VERSION 3.5
+
+## Now install R and littler, and create a link for littler in /usr/local/bin
+## Also set a default CRAN repo, and make sure littler knows about it too
+RUN apt-get update \
+    && apt-get install -t unstable -y --no-install-recommends \
+        libssh2-1-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        littler \
+        r-cran-littler \
+        r-base=${R_BASE_VERSION}* \
+        r-base-dev=${R_BASE_VERSION}* \
+        r-recommended=${R_BASE_VERSION}* \
+        && echo 'options(repos = c(CRAN = "https://cran.rstudio.com/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
+        && echo 'source("/etc/R/Rprofile.site")' >> /etc/littler.r \
+    && ln -s /usr/share/doc/littler/examples/install.r /usr/local/bin/install.r \
+    && ln -s /usr/share/doc/littler/examples/install2.r /usr/local/bin/install2.r \
+    && ln -s /usr/share/doc/littler/examples/installGithub.r /usr/local/bin/installGithub.r \
+    && ln -s /usr/share/doc/littler/examples/testInstalled.r /usr/local/bin/testInstalled.r \
+    && install.r docopt \
+    && rm -rf /tmp/downloaded_packages/ /tmp/*.rds \
+&& rm -rf /var/lib/apt/lists/*
+
+
+RUN source activate $PYTHON_3_ENV
+
+RUN R -e 'install.packages("IRkernel")' && \
+    R -e 'IRkernel::installspec(user = FALSE)' && \
+    R -e 'install.packages("devtools")' && \
+    R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()' && \
+    R -e 'install.packages("bigQueryR"); install.packages("googleCloudStorageR")' && \
+    R -e 'install.packages("feather")' && \
+    R -e 'install.packages("tensorflow")'
+
+RUN source deactivate
+
+RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds
+
 
 COPY config/py2-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel.json
 COPY config/py3-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel.json
