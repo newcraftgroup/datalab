@@ -290,15 +290,15 @@ RUN mkdir /usr/licenses && \
 
 
 
-RUN echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list.d/debian-unstable.list \
-    && echo 'APT::Default-Release "testing";' > /etc/apt/apt.conf.d/default
+RUN echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list.d/debian-unstable.list
 
 ENV R_BASE_VERSION 3.5
 
 ## Now install R and littler, and create a link for littler in /usr/local/bin
 ## Also set a default CRAN repo, and make sure littler knows about it too
 RUN apt-get update \
-    && apt-get install -t unstable -y --no-install-recommends \
+    && apt-get install -t unstable -y --no-install-recommends --allow-unauthenticated \
+        g++ \
         libssh2-1-dev \
         libcurl4-openssl-dev \
         libssl-dev \
@@ -320,18 +320,25 @@ RUN apt-get update \
 
 RUN source activate $PYTHON_3_ENV
 
-RUN R -e 'install.packages("IRkernel")' && \
-    R -e 'IRkernel::installspec(user = FALSE)' && \
-    R -e 'install.packages("devtools")' && \
-    R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()' && \
+RUN pip install jupyter
+
+RUN R -e 'install.packages("devtools")'
+RUN R -e 'install.packages("IRkernel")'
+RUN R -e 'IRkernel::installspec(user=FALSE)'
+
+RUN R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()' && \
     R -e 'install.packages("bigQueryR"); install.packages("googleCloudStorageR")' && \
     R -e 'install.packages("feather")' && \
     R -e 'install.packages("tensorflow")'
 
+RUN R -e 'install.packages("readr")' && \
+    R -e 'install.packages("mice")' && \
+    R -e 'install.packages("VIM")' && \
+    R -e 'install.packages("bayesm")'
+
 RUN source deactivate
 
-RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds
-
+RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds /tmp/*
 
 COPY config/py2-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel.json
 COPY config/py3-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel.json
