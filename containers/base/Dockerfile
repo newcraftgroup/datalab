@@ -322,27 +322,16 @@ RUN source activate $PYTHON_3_ENV
 
 RUN pip install jupyter
 
-RUN R -e 'install.packages("devtools")'
-RUN R -e 'install.packages("IRkernel")'
+RUN R -e 'install.packages(c("devtools", "IRkernel"))'
+
 RUN R -e 'IRkernel::installspec(user=FALSE)'
 
 RUN R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()' && \
     R -e 'install.packages("bigQueryR"); install.packages("googleCloudStorageR")' && \
-    R -e 'install.packages("bigrquery");' && \
-    R -e 'install.packages("feather")' && \
-    R -e 'install.packages("tensorflow")'
+    R -e 'install.packages(c("bigrquery", "feather", "tensorflow"));'
 
-RUN R -e 'install.packages("readr")' && \
-    R -e 'install.packages("RSKC")' && \
-    R -e 'install.packages("mice")' && \
-    R -e 'install.packages("VIM")' && \
-    R -e 'install.packages("bayesm")' && \
-    R -e 'install.packages("AER")' && \
-    R -e 'install.packages("stats")' && \
-    R -e 'install.packages("testit")' && \
-    R -e 'install.packages("klaR")'  && \
-    R -e 'install.packages("clustMixType")' && \
-    R -e 'install.packages("survival")'
+RUN R -e 'install.packages(c("readr", "RSKC", "mice", "VIM", "bayesm", "AER",
+            "stats", "testit", "klaR", "clustMixType", "survival", "reticulate"))'
 
 RUN source deactivate
 
