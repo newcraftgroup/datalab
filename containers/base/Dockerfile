@@ -330,8 +330,7 @@ RUN R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()'
     R -e 'install.packages("bigQueryR"); install.packages("googleCloudStorageR")' && \
     R -e 'install.packages(c("bigrquery", "feather", "tensorflow"));'
 
-RUN R -e 'install.packages(c("readr", "RSKC", "mice", "VIM", "bayesm", "AER",
-            "stats", "testit", "klaR", "clustMixType", "survival", "reticulate"))'
+RUN R -e 'install.packages(c("readr", "RSKC", "mice", "VIM", "bayesm", "AER", "stats", "testit", "klaR", "clustMixType", "survival", "reticulate", "doMC"))'
 
 RUN source deactivate
 
