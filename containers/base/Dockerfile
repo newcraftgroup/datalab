@@ -256,12 +256,13 @@ RUN if [ -d /datalab/lib/pydatalab/.git ]; then \
     tsc --module amd --noImplicitAny --outdir google/datalab/notebook/static google/datalab/notebook/static/*.ts && \
     /tools/node/bin/npm uninstall -g typescript && \
     cd /datalab/lib/pydatalab && \
-# Install Python2 pydatalab packages
-    source activate $PYTHON_2_ENV && \
-    pip install --upgrade-strategy only-if-needed --no-cache-dir . && \
-    pip install --upgrade-strategy only-if-needed /datalab/lib/pydatalab/solutionbox/image_classification/. && \
-    pip install --upgrade-strategy only-if-needed /datalab/lib/pydatalab/solutionbox/structured_data/. && \
-    source deactivate && \
+## Install Python2 pydatalab packages
+#    source activate $PYTHON_2_ENV && \
+#    pip install pandas && \
+#    pip install --upgrade-strategy only-if-needed --no-cache-dir . && \
+#    pip install --upgrade-strategy only-if-needed /datalab/lib/pydatalab/solutionbox/image_classification/. && \
+#    pip install --upgrade-strategy only-if-needed /datalab/lib/pydatalab/solutionbox/structured_data/. && \
+#    source deactivate && \
 # Install Python3 pydatalab packages and Jupyter extensions. The Datalab web app
 # will also be started from the Python3 env.
     source activate $PYTHON_3_ENV && \
@@ -293,7 +294,7 @@ RUN mkdir /usr/licenses && \
 
 RUN echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list.d/debian-unstable.list
 
-ENV R_BASE_VERSION 3.5
+ENV R_BASE_VERSION 3.6
 
 ## Now install R and littler, and create a link for littler in /usr/local/bin
 ## Also set a default CRAN repo, and make sure littler knows about it too
@@ -337,10 +338,10 @@ RUN source deactivate
 
 RUN rm -rf /tmp/downloaded_packages/ /tmp/*.rds /tmp/*
 
-COPY config/py2-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel.json
+#COPY config/py2-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel.json
 COPY config/py3-kernel.json $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel.json
-COPY config/py2-kernel-startup.sh $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel-startup.sh
+#COPY config/py2-kernel-startup.sh $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel-startup.sh
 COPY config/py3-kernel-startup.sh $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel-startup.sh
 
-RUN chmod 755 $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel-startup.sh && \
-    chmod 755 $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel-startup.sh
+#RUN chmod 755 $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python2/kernel-startup.sh && \
+RUN    chmod 755 $DATALAB_CONDA_DIR/envs/$PYTHON_3_ENV/share/jupyter/kernels/python3/kernel-startup.sh
