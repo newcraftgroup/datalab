@@ -294,8 +294,6 @@ RUN mkdir /usr/licenses && \
 
 RUN echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list.d/debian-unstable.list
 
-ENV R_BASE_VERSION 3.6
-
 ## Now install R and littler, and create a link for littler in /usr/local/bin
 ## Also set a default CRAN repo, and make sure littler knows about it too
 RUN apt-get update \
@@ -306,9 +304,10 @@ RUN apt-get update \
         libssl-dev \
         littler \
         r-cran-littler \
-        r-base=${R_BASE_VERSION}* \
-        r-base-dev=${R_BASE_VERSION}* \
-        r-recommended=${R_BASE_VERSION}* \
+        r-base \
+        r-base-dev \
+        r-recommended \
+        libxml2-dev \
         && echo 'options(repos = c(CRAN = "https://cran.rstudio.com/"), download.file.method = "libcurl")' >> /etc/R/Rprofile.site \
         && echo 'source("/etc/R/Rprofile.site")' >> /etc/littler.r \
     && ln -s /usr/share/doc/littler/examples/install.r /usr/local/bin/install.r \
@@ -332,7 +331,7 @@ RUN R -e 'install.packages("googleAuthR"); library(googleAuthR); gar_gce_auth()'
     R -e 'install.packages("bigQueryR"); install.packages("googleCloudStorageR")' && \
     R -e 'install.packages(c("bigrquery", "feather", "tensorflow"));'
 
-RUN R -e 'install.packages(c("readr", "RSKC", "mice", "VIM", "bayesm", "AER", "stats", "testit", "klaR", "clustMixType", "survival", "reticulate", "doMC"))'
+RUN R -e 'install.packages(c("tidyverse", "readr", "RSKC", "mice", "VIM", "bayesm", "AER", "stats", "testit", "klaR", "clustMixType", "survival", "reticulate", "doMC"))'
 
 RUN source deactivate
 
